@@ -3,10 +3,11 @@
 
 # put your AWS credentials in /root/aws-creds.sh
 source /root/aws-creds.sh
+report="/root/reports_completed"
 
 unsecure="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
-rm -rf /root/reports_completed
-mkdir /root/reports_completed
+rm -rf $report
+mkdir $report
 
 key="/root/flying_snow.pem"
 
@@ -37,7 +38,7 @@ do ssh $unsecure -i $key ubuntu@$instance "sudo -u seqware -i /home/seqware/bin/
 
 done
 
-completed=`grep completed /root/reports_completed/ec* | wc -l`
+completed=`grep completed $report/* | wc -l`
 echo "There were $completed workflows completed by the AWS Ireland instances."
 
 

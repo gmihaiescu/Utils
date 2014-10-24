@@ -3,10 +3,11 @@
 
 # put your AWS credentials in /root/aws-creds.sh
 source /root/aws-creds.sh
+report="/tmp/reports"
 
 unsecure="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
-rm -rf /root/reports
-mkdir /root/reports
+rm -rf $report
+mkdir $report
 
 key="/root/flying_snow.pem"
 
@@ -40,6 +41,6 @@ ssh $unsecure -i $key ubuntu@$instance "chmod +x /tmp/check-seqware-jobs-duratio
 done
 
 echo "These are the issues discovered:"
-echo "There are `egrep "No problems detected" /root/reports/*| wc -l` instances with no problems detected."
-echo "But there are `egrep -v "No problems detected" /root/reports/*| wc -l` instances with the following issues:"
-egrep -v "No problems detected" /root/reports/*
+echo "There are `egrep "No problems detected" $report/*| wc -l` instances with no problems detected."
+echo "But there are `egrep -v "No problems detected" $report/*| wc -l` instances with the following issues:"
+egrep -v "No problems detected" $report/*

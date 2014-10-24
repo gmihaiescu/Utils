@@ -1,5 +1,8 @@
 #!/bin/bash
 #set -x
+
+# Set these variables with correct values
+# The following values are considered to be in HOURS
 bam_stats=5
 bwa_mem=25
 gtdownload=3
@@ -7,6 +10,8 @@ mergeBAM=18
 unmappedReads=3
 upload=10
 accession=21
+
+# The following values are considered to be in kB/s
 upload_rate_alert=100
 download_rate_alert=1000
 
