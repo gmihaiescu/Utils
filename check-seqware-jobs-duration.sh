@@ -7,6 +7,8 @@ mergeBAM=18
 unmappedReads=3
 upload=10
 accession=21
+upload_rate_alert=100
+download_rate_alert=1000
 
 for workflow in `sudo -u seqware -i /home/seqware/bin/seqware workflow report --accession $accession | grep -A 4 -B 1 running| grep 'Workflow Run Engine ID'| awk -F"|" '{print $2}'`;\
 do \
@@ -18,6 +20,7 @@ do \
 		diff=$(($curtime-startshort));\
 		hours=$((diff / 3600));\
 		step_name=`sudo -u seqware -i /usr/bin/qstat -f | grep $step| awk '{print $3}'`
+		work_dir=`sudo -u seqware -i /home/seqware/bin/seqware workflow report --accession 21| grep -B1 $workflow | grep "Workflow Run Working Dir" | awk -F"|" '{print $2}'`
 		
 		case $step_name in
 			bam*)	if [ $hours -gt $bam_stats ]
@@ -34,8 +37,14 @@ do \
 					exit 0
 				fi 
 			;;
-			gtdownload*)	if [ $hours -gt $gtdownload ]
-        				then echo "The job with Workflow Run Engine ID $workflow step ID $step doing $step_name has been running for $hours hours"
+			gtdownload*)	log_file_small=`oozie job -info $workflow -oozie http://localhost:11000/oozie | grep RUNNING| grep 0000| awk -F"@" '{print $2}'| cut -f1 -d" "`	
+					log_file_long=`find $work_dir -name "download.log"`
+					download_rate=`grep Status $log_file_long | tail -5 | awk '{ if ($13 == "MB/s") sum += $12*1024; else sum += $12; n++ } END { if (n > 0) print sum / n; }'`
+					if [ $hours -gt $gtdownload ]
+        				then echo "The job with Workflow Run Engine ID $workflow step ID $step doing $step_name has been running for $hours and downloading at a rate of $download_rate kB/s."
+					exit 2
+					elif [ $download_rate -lt $download_rate_alert ]
+        				then echo "The job with Workflow Run Engine ID $workflow step ID $step doing $step_name is downloading at a rate of $download_rate kB/s."
 					exit 2
 					else echo "No problems detected."
 					exit 0
@@ -55,9 +64,14 @@ do \
 					exit 0
 				fi 
 			;;
-			upload*)	if [ $hours -gt $upload ]
-        				then echo "The job with Workflow Run Engine ID $workflow step ID $step doing $step_name has been running for $hours hours"
+			upload*)	log_file_small=`oozie job -info $workflow -oozie http://localhost:11000/oozie | grep RUNNING| grep 0000| awk -F"@" '{print $2}'| cut -f1 -d" "`	
+					log_file_long=`find $work_dir -name "upload.log"`
+					upload_rate=`grep Status $log_file_long | tail -5 | awk '{ if ($13 == "MB/s") sum += $12*1024; else sum += $12; n++ } END { if (n > 0) print sum / n; }'`
+					if [ $hours -gt $upload ]
+        				then echo "The job with Workflow Run Engine ID $workflow step ID $step doing $step_name has been running for $hours hours and is uploading at a rate of $upload_rate kB/s."
 					exit 2
+					elif [ $upload_rate -lt $upload_rate_alert ]
+        				then echo "The job with Workflow Run Engine ID $workflow step ID $step doing $step_name is uploading at a rate of $upload_rate kB/s."
 					else echo "No problems detected."
 					exit 0
 				fi 
@@ -68,3 +82,4 @@ do \
 		esac
 	done
 done
+

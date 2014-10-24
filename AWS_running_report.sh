@@ -39,3 +39,7 @@ ssh $unsecure -i $key ubuntu@$instance "chmod +x /tmp/check-seqware-jobs-duratio
 
 done
 
+echo "These are the issues discovered:"
+echo "There are `egrep "No problems detected" /root/reports/*| wc -l` instances with no problems detected."
+echo "But there are `egrep -v "No problems detected" /root/reports/*| wc -l` instances with the following issues:"
+egrep -v "No problems detected" /root/reports/*
