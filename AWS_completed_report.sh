@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 #set -x
 
 # put your AWS credentials in /root/aws-creds.sh
 source /root/aws-creds.sh
-report="/root/reports_completed"
+report="/tmp/reports_completed"
 
 unsecure="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 rm -rf $report
@@ -17,7 +17,7 @@ count=`echo $instances| wc -w`
 echo "There are $count instances running in Ireland tagged by youxia."
 
 for instance in $instances;\
-do ssh $unsecure -i $key ubuntu@$instance "sudo -u seqware -i /home/seqware/bin/seqware workflow report --accession 21 | grep -A 4 -B 1 -i completed" > /root/reports_completed/${instance}_report.txt
+do ssh $unsecure -i $key ubuntu@$instance "sudo -u seqware -i /home/seqware/bin/seqware workflow report --accession 21 | grep -A 4 -B 1 -i completed" > $report/${instance}_report.txt
 
 #echo -n "Continue? [y or n]: "
 #read answer

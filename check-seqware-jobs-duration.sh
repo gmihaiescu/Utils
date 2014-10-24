@@ -46,7 +46,7 @@ do \
 					log_file_long=`find $work_dir -name "download.log"`
 					download_rate=`grep Status $log_file_long | tail -5 | awk '{ if ($13 == "MB/s") sum += $12*1024; else sum += $12; n++ } END { if (n > 0) print sum / n; }'`
 					if [ $hours -gt $gtdownload ]
-        				then echo "The job with Workflow Run Engine ID $workflow step ID $step doing $step_name has been running for $hours and downloading at a rate of $download_rate kB/s."
+        				then echo "The job with Workflow Run Engine ID $workflow step ID $step doing $step_name has been running for $hours hours and downloading at a rate of $download_rate kB/s."
 					exit 2
 					elif [ $download_rate -lt $download_rate_alert ]
         				then echo "The job with Workflow Run Engine ID $workflow step ID $step doing $step_name is downloading at a rate of $download_rate kB/s."

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #set -x
 
 # put your AWS credentials in /root/aws-creds.sh
@@ -19,7 +19,7 @@ echo "There are $count instances running in Ireland tagged by youxia."
 echo "Copying the script to tmp"
 for instance in $instances;\
 do scp $unsecure -i $key check-seqware-jobs-duration.sh  ubuntu@$instance:/tmp;\
-ssh $unsecure -i $key ubuntu@$instance "chmod +x /tmp/check-seqware-jobs-duration.sh; /tmp/check-seqware-jobs-duration.sh" > /root/reports/${instance}_report.txt
+ssh $unsecure -i $key ubuntu@$instance "chmod +x /tmp/check-seqware-jobs-duration.sh; /tmp/check-seqware-jobs-duration.sh" > $report/${instance}_report.txt
 
 #echo -n "Continue? [y or n]: "
 #read answer
